@@ -73,9 +73,11 @@ jobs:
             Copy-Item -Recurse -Force public deploy\public
           }
 
-          # Copy web.config, server.iis.js and production .env
+          # Create logs directory for httpPlatformHandler stdout logs
+          New-Item -ItemType Directory -Force -Path deploy\logs | Out-Null
+
+          # Copy web.config and production .env
           Copy-Item -Force web.config deploy\web.config
-          Copy-Item -Force server.iis.js deploy\server.iis.js
           Copy-Item -Force .env deploy\.env
 
           Write-Host "✅ Deployment package prepared in ./deploy folder."
