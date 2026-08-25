@@ -46,12 +46,10 @@ jobs:
           Set-Content -Path ".env" -Value $envContent -Encoding UTF8
           Write-Host "✅ .env created successfully."
 
-      - name: 🗄️ Prisma Generate, Push Schema & Seed to MSSQL
+      - name: 🗄️ Prisma Generate
         shell: pwsh
         run: |
           npx prisma generate
-          npx prisma db push --skip-generate
-          npm run db:seed
 
       - name: 🏗️ Build Next.js (Standalone)
         shell: pwsh
