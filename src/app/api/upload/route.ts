@@ -1,45 +1,84 @@
 import { NextResponse } from "next/server";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { writeFile } from "fs/promises";
+import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
-import { existsSync, mkdirSync } from "fs";
+import { existsSync } from "fs";
 
-// Helper to save image buffer to either local storage or MinIO
+// Determine upload directory paths with multiple fallbacks for IIS Standalone
+function getUploadDirs(): string[] {
+  const cwd = process.cwd();
+  return [
+    join(cwd, "public", "uploads"),
+    join(cwd, "public", "images"),
+    join(cwd, "uploads"),
+  ];
+}
+
+// Helper to save image buffer to disk or MinIO (S3)
 async function saveImageBuffer(buffer: Buffer, filename: string, mimeType: string): Promise<string> {
-  const isLocal = process.env.NODE_ENV === "development" || !process.env.MINIO_ENDPOINT;
+  const hasMinio = !!(
+    process.env.MINIO_ENDPOINT &&
+    process.env.MINIO_ACCESS_KEY &&
+    process.env.MINIO_SECRET_KEY &&
+    process.env.MINIO_ENDPOINT !== "http://localhost:9000" // ignore placeholder
+  );
 
-  if (isLocal) {
-    const uploadDir = join(process.cwd(), "public", "images");
-    if (!existsSync(uploadDir)) {
-      mkdirSync(uploadDir, { recursive: true });
+  // 1. MinIO (S3) if explicitly configured
+  if (hasMinio) {
+    try {
+      const s3Client = new S3Client({
+        region: process.env.MINIO_REGION || "us-east-1",
+        endpoint: process.env.MINIO_ENDPOINT,
+        forcePathStyle: true,
+        credentials: {
+          accessKeyId: process.env.MINIO_ACCESS_KEY || "",
+          secretAccessKey: process.env.MINIO_SECRET_KEY || "",
+        },
+      });
+
+      const bucketName = process.env.MINIO_BUCKET_NAME || "my-blog-images";
+      const command = new PutObjectCommand({
+        Bucket: bucketName,
+        Key: filename,
+        Body: buffer,
+        ContentType: mimeType,
+      });
+
+      await s3Client.send(command);
+      const endpoint = process.env.MINIO_ENDPOINT?.replace(/\/$/, "") || "";
+      return `${endpoint}/${bucketName}/${filename}`;
+    } catch (s3Error) {
+      console.warn("⚠️ MinIO yüklemesi başarısız oldu, yerel depolamaya yazılıyor:", s3Error);
+      // Fallback to local storage below
     }
-    const filepath = join(uploadDir, filename);
-    await writeFile(filepath, buffer);
-    return `/images/${filename}`;
   }
 
-  // Production - MinIO (S3)
-  const s3Client = new S3Client({
-    region: process.env.MINIO_REGION || "us-east-1",
-    endpoint: process.env.MINIO_ENDPOINT,
-    forcePathStyle: true,
-    credentials: {
-      accessKeyId: process.env.MINIO_ACCESS_KEY || "",
-      secretAccessKey: process.env.MINIO_SECRET_KEY || "",
-    },
-  });
+  // 2. Local Disk Storage (Reliable for IIS Standalone & Local Dev)
+  const uploadDirs = getUploadDirs();
+  let saved = false;
+  let lastError: any = null;
 
-  const bucketName = process.env.MINIO_BUCKET_NAME || "my-blog-images";
-  const command = new PutObjectCommand({
-    Bucket: bucketName,
-    Key: filename,
-    Body: buffer,
-    ContentType: mimeType,
-  });
+  for (const dir of uploadDirs) {
+    try {
+      if (!existsSync(dir)) {
+        await mkdir(dir, { recursive: true });
+      }
+      const filepath = join(dir, filename);
+      await writeFile(filepath, buffer);
+      saved = true;
+      break;
+    } catch (err) {
+      lastError = err;
+      console.warn(`⚠️ ${dir} dizinine yazılamadı:`, err);
+    }
+  }
 
-  await s3Client.send(command);
-  const endpoint = process.env.MINIO_ENDPOINT?.replace(/\/$/, "") || "";
-  return `${endpoint}/${bucketName}/${filename}`;
+  if (!saved) {
+    throw new Error(`Görsel diske kaydedilemedi: ${lastError?.message || "Yazma izni hatası"}`);
+  }
+
+  // Always return the dedicated dynamic image API route URL for guaranteed streaming in Next.js Standalone
+  return `/api/images/${filename}`;
 }
 
 export async function POST(request: Request) {
@@ -58,8 +97,12 @@ export async function POST(request: Request) {
         );
       }
 
-      // If it's already a local permanent URL, return directly
-      if (imageUrl.startsWith("/images/") || imageUrl.startsWith("/uploads/")) {
+      // If it's already a permanent URL, return directly
+      if (
+        imageUrl.startsWith("/api/images/") ||
+        imageUrl.startsWith("/images/") ||
+        imageUrl.startsWith("/uploads/")
+      ) {
         return NextResponse.json({
           success: 1,
           file: { url: imageUrl },
@@ -82,6 +125,7 @@ export async function POST(request: Request) {
         }
         mimeType = matches[1];
         ext = mimeType.split("/")[1] || "png";
+        if (ext === "jpeg") ext = "jpg";
         buffer = Buffer.from(matches[2], "base64");
       } else {
         // Fetch remote image from URL
@@ -135,9 +179,13 @@ export async function POST(request: Request) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
-    const ext = file.name && file.name.includes(".")
-      ? file.name.split(".").pop()?.toLowerCase() || "png"
-      : file.type ? file.type.split("/")[1] || "png" : "png";
+    let ext = "png";
+    if (file.name && file.name.includes(".")) {
+      ext = file.name.split(".").pop()?.toLowerCase() || "png";
+    } else if (file.type && file.type.startsWith("image/")) {
+      ext = file.type.split("/")[1] || "png";
+      if (ext === "jpeg") ext = "jpg";
+    }
 
     const baseName = (file.name || "image")
       .replace(/\.[^/.]+$/, "")
@@ -155,7 +203,7 @@ export async function POST(request: Request) {
       url: savedUrl,
     });
   } catch (error: any) {
-    console.error("Upload error:", error);
+    console.error("❌ [API:upload] Upload error:", error);
     return NextResponse.json(
       {
         success: 0,

@@ -99,7 +99,11 @@ export async function uploadSingleFile(file: File): Promise<string> {
  */
 export async function uploadUrlOrBase64(urlOrBase64: string): Promise<string> {
   // Eğer zaten yerel kalıcı bir URL ise doğrudan dön
-  if (urlOrBase64.startsWith("/images/") || urlOrBase64.startsWith("/uploads/")) {
+  if (
+    urlOrBase64.startsWith("/api/images/") ||
+    urlOrBase64.startsWith("/images/") ||
+    urlOrBase64.startsWith("/uploads/")
+  ) {
     return urlOrBase64;
   }
 
