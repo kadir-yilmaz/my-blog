@@ -107,12 +107,18 @@ jobs:
 
           Write-Host "🚀 Deploying to $computerName ..."
 
-          & $msDeployPath `
-            -verb:sync `
-            -source:contentPath="$sourcePath" `
-            -dest:contentPath="$site",computerName="$computerName",userName="$user",password="$pass",authType="Basic" `
-            -allowUntrusted `
-            -enableRule:DoNotDeleteRule
+          $sourceArg = "-source:contentPath='$sourcePath'"
+          $destArg = "-dest:contentPath='$site',computerName='$computerName',userName='$user',password='$pass',authType='Basic'"
+
+          $deployArgs = @(
+            "-verb:sync",
+            $sourceArg,
+            $destArg,
+            "-allowUntrusted",
+            "-enableRule:DoNotDeleteRule"
+          )
+
+          & $msDeployPath @deployArgs
 
           if ($LASTEXITCODE -ne 0) {
             Write-Error "MSDeploy failed with exit code $LASTEXITCODE"
