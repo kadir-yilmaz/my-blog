@@ -17,6 +17,8 @@ import GitHub from "next-auth/providers/github";
 import Google from "next-auth/providers/google";
 
 export default {
+  trustHost: true,
+  secret: process.env.AUTH_SECRET || process.env.NEXTAUTH_SECRET,
   providers: [
     // 🎓 GitHub OAuth Provider
     // Kullanıcı GitHub hesabıyla giriş yapabilir
