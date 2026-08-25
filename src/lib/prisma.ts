@@ -6,6 +6,7 @@
 // Next.js development hot reload esnasında bağlantı havuzunun (connection pool)
 // tükenmesini engellemek için singleton pattern kullanılmaya devam edilir.
 
+import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
 import { PrismaMssql } from "@prisma/adapter-mssql";
 
