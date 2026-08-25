@@ -180,6 +180,6 @@ export async function getCategoryTree() {
   return { 
     success: true, 
     data: buildTree(null), 
-    totalArticles: DEFAULT_CATEGORIES.reduce((acc, c) => acc + (c._count?.articles || 0), 0) || 3 
+    totalArticles: 0
   };
 }
