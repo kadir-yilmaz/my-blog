@@ -1,0 +1,247 @@
+/* ==========================================
+ * 🎨 Editor.js Theme & Layout Styles
+ * ==========================================
+ */
+
+.editorjs-wrapper {
+  width: 100%;
+  min-height: 500px;
+  position: relative;
+  border-radius: var(--radius-lg);
+  color: var(--foreground);
+}
+
+/* Editor container alignment & padding */
+.editorjs-wrapper .codex-editor {
+  padding: 0;
+}
+
+.editorjs-wrapper .codex-editor__redactor {
+  padding-bottom: 200px !important;
+}
+
+.editorjs-wrapper .ce-block__content {
+  max-width: 100% !important;
+  margin: 0 auto;
+}
+
+.editorjs-wrapper .ce-toolbar__content {
+  max-width: 100% !important;
+}
+
+/* Placeholder styling */
+.editorjs-wrapper .codex-editor--empty .ce-block:first-child .ce-paragraph[data-placeholder]::before {
+  color: var(--muted-foreground);
+  opacity: 0.5;
+  font-style: normal;
+}
+
+.editorjs-wrapper [data-placeholder]::before {
+  color: var(--muted-foreground) !important;
+  opacity: 0.5;
+}
+
+/* Selection background */
+.editorjs-wrapper ::selection {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* Inline Toolbar & Popovers */
+.ce-inline-toolbar,
+.ce-conversion-toolbar,
+.ce-popover,
+.ce-settings {
+  background-color: var(--popover) !important;
+  color: var(--popover-foreground) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  z-index: 99 !important;
+}
+
+.ce-inline-toolbar__buttons button,
+.ce-popover__item-icon,
+.ce-popover__item-label,
+.ce-toolbar__plus,
+.ce-toolbar__settings-btn {
+  color: var(--foreground) !important;
+}
+
+.ce-inline-toolbar__buttons button:hover,
+.ce-toolbar__plus:hover,
+.ce-toolbar__settings-btn:hover,
+.ce-popover__item:hover {
+  background-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+.ce-popover__item--active {
+  background-color: var(--accent) !important;
+  color: var(--accent-foreground) !important;
+}
+
+.ce-popover__search-field {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+}
+
+/* Header Tool Styles (Override Tailwind v4 heading resets) */
+.ce-header {
+  font-weight: 700 !important;
+  color: var(--foreground) !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.75rem !important;
+  padding: 0 !important;
+}
+
+h1.ce-header {
+  font-size: 2.25rem !important;
+  line-height: 2.5rem !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.025em !important;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.5rem !important;
+}
+
+h2.ce-header {
+  font-size: 1.75rem !important;
+  line-height: 2rem !important;
+  font-weight: 700 !important;
+}
+
+h3.ce-header {
+  font-size: 1.35rem !important;
+  line-height: 1.75rem !important;
+  font-weight: 600 !important;
+}
+
+h4.ce-header {
+  font-size: 1.15rem !important;
+  line-height: 1.5rem !important;
+  font-weight: 600 !important;
+}
+
+/* Code Block Tool */
+.ce-code__textarea {
+  background-color: #0d1117 !important;
+  color: #f0f6fc !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.875rem !important;
+  line-height: 1.6 !important;
+  padding: 1rem !important;
+  min-height: 100px;
+  tab-size: 2;
+  white-space: pre !important;
+  overflow-y: hidden !important;
+  resize: vertical;
+}
+
+/* Image Tool */
+.image-tool {
+  margin: 1.75rem 0;
+}
+.image-tool__image {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  background-color: rgba(125, 125, 125, 0.04);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  max-width: 100%;
+}
+.image-tool__image-picture {
+  max-width: 100% !important;
+  max-height: 600px !important;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain !important;
+  margin: 0 auto;
+  display: block;
+}
+.image-tool--stretched .image-tool__image-picture {
+  width: 100% !important;
+  max-height: 850px !important;
+}
+.image-tool--withBackground .image-tool__image {
+  background-color: var(--muted) !important;
+  padding: 1.5rem;
+}
+.image-tool--withBorder .image-tool__image {
+  border: 2px solid var(--primary) !important;
+}
+.image-tool__caption,
+.cdx-input {
+  background-color: var(--background) !important;
+  color: var(--foreground) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-sm) !important;
+  padding: 0.5rem 0.75rem !important;
+  margin-top: 0.5rem !important;
+  text-align: center;
+}
+
+/* Quote Tool */
+.cdx-quote {
+  border-left: 4px solid var(--primary);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+}
+
+/* Table Tool */
+.tc-table {
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  overflow: hidden;
+  background-color: var(--card) !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+  margin: 1.25rem 0 !important;
+}
+.tc-table__wrap {
+  border: none !important;
+}
+.tc-row--header {
+  background-color: var(--muted) !important;
+  font-weight: 600 !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+.tc-row--header .tc-cell {
+  color: var(--muted-foreground) !important;
+  font-weight: 600 !important;
+  font-size: 0.8rem !important;
+  letter-spacing: normal !important;
+}
+.tc-row:hover {
+  background-color: rgba(125, 125, 125, 0.04) !important;
+}
+.tc-cell {
+  border-color: var(--border) !important;
+  color: var(--foreground) !important;
+  padding: 0.55rem 0.85rem !important;
+  font-size: 0.825rem !important;
+  line-height: 1.4 !important;
+}
+
+/* List Tool */
+.cdx-list {
+  padding-left: 1.5rem;
+}
+.cdx-list__item {
+  padding: 0.2rem 0;
+}
+
+/* Checklist Tool */
+.cdx-checklist__item-checkbox {
+  border-color: var(--border) !important;
+  background-color: var(--background) !important;
+}
+.cdx-checklist__item--checked .cdx-checklist__item-checkbox {
+  background-color: var(--primary) !important;
+  border-color: var(--primary) !important;
+}

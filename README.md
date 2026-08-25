@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# My Blog & Portfolio
 
-## Getting Started
+Modern **Next.js 16 (App Router)**, **React 19**, **Tailwind CSS v4**, **Prisma 7 (SQL Server)**, **Editor.js** ve **Auth.js v5** ile geliştirilmiş kişisel portföy ve teknik blog platformu.
 
-First, run the development server:
+---
 
+## 📦 Kullanılan Teknolojiler ve Paketler
+
+### 1. Çekirdek (Core & Framework)
+- **`next`** (`16.2.11`): Next.js App Router, Turbopack ve Server Actions destekli modern React framework'ü.
+- **`react` & `react-dom`** (`19.2.4`): React 19 Server Components ve Hooks altyapısı.
+- **`typescript`** (`^5`): Tam type-safe kod geliştirme desteği.
+
+### 2. Arayüz ve Tasarım (UI & Styling)
+- **`tailwindcss` & `@tailwindcss/postcss`** (`^4`): Tailwind CSS v4 motoru ve modern CSS değişkenleri.
+- **`@tailwindcss/typography`** (`^0.5.20`): Blog makaleleri ve zengin metinler için gelişmiş tipografi stilleri (`prose`).
+- **`lucide-react`** (`^1.25.0`): Kapsamlı ve hafif modern SVG ikon kütüphanesi.
+- **`next-themes`** (`^0.4.6`): Koyu (Dark) ve Açık (Light) tema geçiş desteği.
+- **`clsx` & `tailwind-merge`**: Koşullu CSS sınıflarını dinamik ve çakışmasız birleştirme.
+
+### 3. Zengin Metin Editörü (Editor.js)
+- **`@editorjs/editorjs` & Eklentileri (`@editorjs/*`)**: Blok tabanlı, JSON çıktısı üreten modern zengin metin editörü (Başlık, resim, kod bloğu, tablo, liste, alıntı ve vurgulama araçları).
+
+
+### 4. Veritabanı ve ORM (Database & Prisma)
+- **`prisma` & `@prisma/client`** (`^7.9.0`): Next-gen Type-safe ORM ve migration motoru.
+- **`@prisma/adapter-mssql` & `mssql`** (`^12.7.0`): Microsoft SQL Server bağlantı adaptörü ve sürücüsü.
+- **`@prisma/adapter-pg` & `pg`** (`^8.22.0`): PostgreSQL bağlantı adaptörü (alternatif veritabanı desteği).
+
+### 5. Kimlik Doğrulama ve Güvenlik (Auth & Security)
+- **`next-auth`** (`^5.0.0-beta.32`): Auth.js v5 - Session yönetimi, Admin korumalı rotalar ve OAuth/Credentials sağlayıcıları.
+- **`@auth/prisma-adapter`** (`^2.11.3`): Auth.js ile Prisma modelleri arasındaki oturum köprüsü.
+- **`bcryptjs`** (`^3.0.3`): Güvenli parola hashleme ve doğrulama.
+
+### 6. Depolama, Doğrulama ve Durum Yönetimi
+- **`@aws-sdk/client-s3`** (`^3.1092.0`): MinIO ve AWS S3 bulut nesne depolama SDK'sı.
+- **`zod`** (`^4.4.3`): Veri şeması ve form doğrulama kütüphanesi.
+- **`zustand`** (`^5.0.14`): Hızlı ve hafif istemci tarafı durum yönetimi (Global State).
+- **`react-markdown`** (`^10.1.0`): Eski/Fallback markdown metinlerini render motoru.
+- **`dotenv`** (`^17.4.2`): Çevre değişkenleri (`.env`) yönetimi.
+- **`tsx`** (`^4.23.1`): TypeScript dosyalarını doğrudan çalıştırma (Seed ve bakım betikleri).
+- **`eslint` & `eslint-config-next`** (`^9`): Kod standartları ve statik analiz aracı.
+
+---
+
+## 🚀 Projeyi Çalıştırma
+
+### 1. Ortam Değişkenleri
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Yerel Geliştirme (Local Dev)
+```bash
+# 1. SQL Server veritabanını Docker ile başlatın
+docker-compose up -d
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# 2. Veritabanı Şemasını Eşitleyin & Seed Verilerini Yükleyin
+npx prisma db push
+npm run db:seed
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# 3. Next.js uygulamasını başlatın
+npm run dev
+```
 
-## Learn More
+Uygulama `http://localhost:3000` adresinde çalışacaktır.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📚 Dokümantasyon
+- [getting-started.md](file:///c:/Users/kadir/OneDrive/Desktop/Projeler/my-blog/notes/getting-started.md) — Başlangıç ve Kurulum Rehberi
+- [decisions.md](file:///c:/Users/kadir/OneDrive/Desktop/Projeler/my-blog/notes/decisions.md) — Mimari Kararlar Logu
+- [docker.md](file:///c:/Users/kadir/OneDrive/Desktop/Projeler/my-blog/notes/docker.md) — Docker Mimarisi
+- [project-architecture.md](file:///c:/Users/kadir/OneDrive/Desktop/Projeler/my-blog/notes/project-architecture.md) — Genel Sistem Mimarisi

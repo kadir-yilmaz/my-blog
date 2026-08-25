@@ -1,0 +1,124 @@
+name: Deploy to MonsterASP via Web Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: windows-latest
+
+    steps:
+      - name: 📥 Check out repository
+        uses: actions/checkout@v4
+
+      - name: 🟢 Set up Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: ⚙️ Configure Environment & Parse Secrets
+        shell: pwsh
+        env:
+          DEPLOY_SECRETS_JSON: ${{ secrets.DEPLOY_SECRETS_JSON }}
+        run: |
+          if (-not $env:DEPLOY_SECRETS_JSON) {
+            Write-Error "DEPLOY_SECRETS_JSON secret is not defined in GitHub repository secrets!"
+            exit 1
+          }
+
+          $secrets = $env:DEPLOY_SECRETS_JSON | ConvertFrom-Json
+
+          # Write production .env file
+          $lines = @(
+            "DATABASE_URL=$($secrets.DATABASE_URL)",
+            "AUTH_SECRET=$($secrets.AUTH_SECRET)",
+            "ADMIN_EMAIL=$($secrets.ADMIN_EMAIL)",
+            "ADMIN_PASSWORD=$($secrets.ADMIN_PASSWORD)",
+            "NEXT_PUBLIC_APP_URL=$($secrets.NEXT_PUBLIC_APP_URL)",
+            "AUTO_MIGRATE=false",
+            "NODE_ENV=production"
+          )
+          $envContent = $lines -join "`n"
+          Set-Content -Path ".env" -Value $envContent -Encoding UTF8
+          Write-Host "✅ .env created successfully."
+
+      - name: 🗄️ Prisma Generate, Push Schema & Seed to MSSQL
+        shell: pwsh
+        run: |
+          npx prisma generate
+          npx prisma db push --skip-generate
+          npm run db:seed
+
+      - name: 🏗️ Build Next.js (Standalone)
+        shell: pwsh
+        run: npm run build
+
+      - name: 📦 Prepare Deployment Bundle
+        shell: pwsh
+        run: |
+          # Create deployment folder
+          New-Item -ItemType Directory -Force -Path deploy | Out-Null
+
+          # Copy standalone server bundle
+          Copy-Item -Recurse -Force .next\standalone\* deploy\
+
+          # Copy static files to .next/static inside deploy
+          New-Item -ItemType Directory -Force -Path deploy\.next\static | Out-Null
+          Copy-Item -Recurse -Force .next\static\* deploy\.next\static\
+
+          # Copy public folder
+          if (Test-Path public) {
+            Copy-Item -Recurse -Force public deploy\public
+          }
+
+          # Copy web.config and production .env
+          Copy-Item -Force web.config deploy\web.config
+          Copy-Item -Force .env deploy\.env
+
+          Write-Host "✅ Deployment package prepared in ./deploy folder."
+
+      - name: 🚀 Deploy via MSDeploy (Web Deploy)
+        shell: pwsh
+        env:
+          DEPLOY_SECRETS_JSON: ${{ secrets.DEPLOY_SECRETS_JSON }}
+        run: |
+          $secrets = $env:DEPLOY_SECRETS_JSON | ConvertFrom-Json
+
+          $msDeployPath = "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe"
+          if (-not (Test-Path $msDeployPath)) {
+            $msDeployPath = "C:\Program Files (x86)\IIS\Microsoft Web Deploy V3\msdeploy.exe"
+          }
+
+          if (-not (Test-Path $msDeployPath)) {
+            Write-Error "MSDeploy.exe not found on runner!"
+            exit 1
+          }
+
+          $server = $secrets.WEBDEPLOY_SERVER
+          $port = if ($secrets.WEBDEPLOY_PORT) { $secrets.WEBDEPLOY_PORT } else { "8172" }
+          $site = $secrets.WEBDEPLOY_SITE
+          $user = $secrets.WEBDEPLOY_USERNAME
+          $pass = $secrets.WEBDEPLOY_PASSWORD
+
+          $computerName = "https://${server}:${port}/msdeploy.axd?site=${site}"
+          $sourcePath = "$((Get-Location).Path)\deploy"
+
+          Write-Host "🚀 Deploying to $computerName ..."
+
+          & $msDeployPath `
+            -verb:sync `
+            -source:contentPath="$sourcePath" `
+            -dest:contentPath="$site",computerName="$computerName",userName="$user",password="$pass",authType="Basic" `
+            -allowUntrusted `
+            -enableRule:DoNotDeleteRule
+
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "MSDeploy failed with exit code $LASTEXITCODE"
+            exit $LASTEXITCODE
+          }
+
+          Write-Host "🎉 Deployment completed successfully!"

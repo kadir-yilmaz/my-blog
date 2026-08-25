@@ -1,0 +1,297 @@
+// ==========================================
+// 🎓 Prisma Schema — Veritabanı Tasarımı (SQL Server)
+// ==========================================
+// Bu dosya, veritabanı tablolarını TypeScript benzeri bir DSL ile tanımlar.
+// Prisma bu dosyadan:
+//   1. TypeScript client oluşturur (type-safe DB sorguları)
+//   2. SQL migration dosyaları üretir
+//   3. Veritabanını senkronize eder
+//
+// Komutlar:
+//   npx prisma migrate dev    → Migration oluştur + uygula (development)
+//   npx prisma migrate deploy → Migration uygula (production)
+//   npx prisma generate       → TypeScript client'ı yeniden oluştur
+//   npx prisma studio         → Web tabanlı DB explorer (localhost:5555)
+//   npx prisma db seed        → Seed data yükle
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+}
+
+// ==========================================
+// 👤 User — Kullanıcı / Yazar
+// ==========================================
+// Auth.js ile entegre. Hem admin (sen) hem de yorum yapan okuyucular.
+// RBAC yok: isAdmin boolean yeterli (single-author blog)
+model User {
+  id             String    @id @default(cuid())
+  name           String?
+  email          String    @unique
+  emailVerified  DateTime?
+  image          String?
+  hashedPassword String?   // Credentials provider için
+  bio            String?
+  isAdmin        Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  // 🎓 İlişkiler (Relations)
+  accounts  Account[]
+  sessions  Session[]
+  articles  Article[]
+  comments  Comment[]
+  likes     Like[]
+  bookmarks Bookmark[]
+
+  @@map("users")
+}
+
+// ==========================================
+// 🔐 Auth.js Models
+// ==========================================
+// Auth.js v5 Prisma Adapter'ın gerektirdiği tablolar.
+// Bu tablolar OAuth provider'lar (GitHub, Google) için gerekli.
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.NVarChar(Max)
+  access_token      String? @db.NVarChar(Max)
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.NVarChar(Max)
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ==========================================
+// 📝 Article — Blog Makaleleri
+// ==========================================
+// Makale içeriği Markdown formatında saklanır.
+// status: DRAFT → sadece admin görür, PUBLISHED → herkese açık
+// Slug DB'de tutulmaz, URL'de dinamik: `makale-adi-a-makaleidbase62`
+model Article {
+  id          String    @id @default(cuid())
+  title       String
+  content     String    @db.NVarChar(Max)
+  excerpt     String?   @db.NVarChar(Max) // Kısa özet (blog listesinde gösterilir)
+  coverImage  String?            // Kapak resmi URL'si
+  status      String    @default("DRAFT") // "DRAFT" | "PUBLISHED"
+  readingTime Int       @default(0) // Dakika cinsinden tahmini okuma süresi
+  publishedAt DateTime? // null = henüz yayınlanmadı
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // İlişkiler
+  authorId   String
+  author     User       @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  categoryId String?
+  category   Category?  @relation(fields: [categoryId], references: [id], onDelete: SetNull, onUpdate: NoAction)
+
+  tags       ArticleTag[]
+  comments   Comment[]
+  likes      Like[]
+  bookmarks  Bookmark[]
+  views      View[]
+
+  @@index([status, publishedAt(sort: Desc)])
+  @@index([categoryId])
+  @@index([authorId])
+  @@map("articles")
+}
+
+// ==========================================
+// 📂 Category — Sonsuz Derinlik Kategori Sistemi
+// ==========================================
+// parentId ile self-referencing ilişki.
+// Örnek: .NET → ASP.NET Core → Minimal APIs
+// Slug DB'de tutulmaz, URL'de dinamik: `kategori-adi-c-categoryidbase62`
+model Category {
+  id       String  @id @default(cuid())
+  name     String
+  order    Int     @default(0) // Sıralama (admin'den ayarlanır)
+
+  parentId String?
+  parent   Category?  @relation("CategoryTree", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children Category[] @relation("CategoryTree")
+
+  articles Article[]
+
+  @@index([parentId])
+  @@map("categories")
+}
+
+// ==========================================
+// 🏷️ Tag — Etiketler
+// ==========================================
+model Tag {
+  id    String @id @default(cuid())
+  name  String @unique
+  color String @default("#3B82F6") // Etiket rengi (UI'da kullanılır)
+
+  articles ArticleTag[]
+
+  @@map("tags")
+}
+
+// ==========================================
+// 🔗 ArticleTag — Makale-Etiket İlişkisi (Many-to-Many)
+// ==========================================
+model ArticleTag {
+  articleId String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  tagId String
+  tag   Tag @relation(fields: [tagId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([articleId, tagId])
+  @@map("article_tags")
+}
+
+// ==========================================
+// 💬 Comment — Yorumlar (Login Zorunlu)
+// ==========================================
+// Nested yorumlar: parentId ile üst yoruma yanıt verebilme
+model Comment {
+  id        String   @id @default(cuid())
+  content   String   @db.NVarChar(Max)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  articleId String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  parentId String?
+  parent   Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies  Comment[] @relation("CommentReplies")
+
+  @@index([articleId])
+  @@index([userId])
+  @@index([parentId])
+  @@map("comments")
+}
+
+// ==========================================
+// ❤️ Like — Beğeniler
+// ==========================================
+model Like {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  articleId String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([articleId, userId])
+  @@map("likes")
+}
+
+// ==========================================
+// 🔖 Bookmark — Yer İmleri
+// ==========================================
+model Bookmark {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  articleId String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  userId String
+  user   User @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([articleId, userId])
+  @@map("bookmarks")
+}
+
+// ==========================================
+// 👁️ View — Görüntülenme Takibi
+// ==========================================
+model View {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  articleId String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  ip        String?
+  userAgent String?
+
+  @@index([articleId])
+  @@index([articleId, ip])
+  @@map("views")
+}
+
+
+
+// ==========================================
+// 💼 Experience — İş Deneyimleri
+// ==========================================
+model Experience {
+  id          String    @id @default(cuid())
+  company     String
+  role        String
+  description String    @db.NVarChar(Max)
+  startDate   DateTime
+  endDate     DateTime?
+  current     Boolean   @default(false)
+  order       Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("experiences")
+}
+
+// ==========================================
+// 🎯 Skill — Yetenekler
+// ==========================================
+model Skill {
+  id          String @id @default(cuid())
+  name        String
+  category    String // "Frontend", "Backend", "DevOps", "Database" vb.
+  icon        String?
+  proficiency Int    @default(0) // 0-100 arası yetkinlik
+  order       Int    @default(0)
+
+  @@index([category])
+  @@map("skills")
+}
+
+
