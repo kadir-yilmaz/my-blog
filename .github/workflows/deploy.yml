@@ -43,7 +43,7 @@ jobs:
             "ADMIN_EMAIL=$($secrets.ADMIN_EMAIL)",
             "ADMIN_PASSWORD=$($secrets.ADMIN_PASSWORD)",
             "NEXT_PUBLIC_APP_URL=$($secrets.NEXT_PUBLIC_APP_URL)",
-            "AUTO_MIGRATE=false",
+            "AUTO_MIGRATE=true",
             "NODE_ENV=production"
           )
           $envContent = $lines -join "`n"
