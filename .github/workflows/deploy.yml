@@ -46,6 +46,12 @@ jobs:
             "ADMIN_EMAIL=$($secrets.ADMIN_EMAIL)",
             "ADMIN_PASSWORD=$($secrets.ADMIN_PASSWORD)",
             "NEXT_PUBLIC_APP_URL=$($secrets.NEXT_PUBLIC_APP_URL)",
+            "SMTP_HOST=$(if ($secrets.SMTP_HOST) { $secrets.SMTP_HOST } else { 'smtp.gmail.com' })",
+            "SMTP_PORT=$(if ($secrets.SMTP_PORT) { $secrets.SMTP_PORT } else { '465' })",
+            "SMTP_SECURE=$(if ($secrets.SMTP_SECURE) { $secrets.SMTP_SECURE } else { 'true' })",
+            "SMTP_USER=$($secrets.SMTP_USER)",
+            "SMTP_PASS=$($secrets.SMTP_PASS)",
+            "CONTACT_RECEIVER_EMAIL=$(if ($secrets.CONTACT_RECEIVER_EMAIL) { $secrets.CONTACT_RECEIVER_EMAIL } else { $secrets.SMTP_USER })",
             "AUTO_MIGRATE=true",
             "NODE_ENV=production"
           )
