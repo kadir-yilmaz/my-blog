@@ -35,7 +35,6 @@ export const siteConfig = {
   // Navigation (Header'da gösterilecek linkler)
   mainNav: [
     { title: "Makaleler", href: "/blog" },
-    { title: "Hakkımda", href: "/about" },
     { title: "İletişim", href: "/contact" },
   ],
 
@@ -47,13 +46,6 @@ export const siteConfig = {
         { title: "Son Yazılar", href: "/blog" },
         { title: "Kategoriler", href: "/blog/category" },
         { title: "Etiketler", href: "/blog/tag" },
-      ],
-    },
-    {
-      title: "Hakkımda",
-      items: [
-        { title: "Biyografi & Kariyer", href: "/about" },
-        { title: "İletişim", href: "/contact" },
       ],
     },
     {
