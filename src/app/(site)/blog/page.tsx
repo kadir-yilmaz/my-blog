@@ -16,7 +16,8 @@ export const metadata: Metadata = {
   description: "Next.js, React, TypeScript, C#, Docker ve bulut mimarileri üzerine derinlemesine teknik makaleler.",
 };
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface BlogPageProps {
   searchParams: Promise<{

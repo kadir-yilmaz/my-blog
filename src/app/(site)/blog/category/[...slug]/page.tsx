@@ -12,7 +12,8 @@ import { Pagination } from "@/components/blog/pagination";
 import { getArticles } from "@/actions/article.actions";
 import { getCategoryTree } from "@/actions/category.actions";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface CategoryPageProps {
   params: Promise<{

@@ -112,9 +112,9 @@ export async function createArticle(data: {
       },
     });
 
+    revalidatePath("/", "layout");
     revalidatePath("/blog");
     revalidatePath("/admin/articles");
-    revalidatePath("/blog/[slug]", "page");
     return { success: true, data: article };
   } catch (error: any) {
     console.error("createArticle error:", error);
@@ -179,10 +179,10 @@ export async function updateArticle(
       });
     }
 
+    revalidatePath("/", "layout");
     revalidatePath("/blog");
     revalidatePath("/admin/articles");
     revalidatePath(`/admin/articles/${id}/edit`);
-    revalidatePath("/blog/[slug]", "page");
     return { success: true, data: article };
   } catch (error: any) {
     console.error("updateArticle error:", error);
@@ -197,9 +197,9 @@ export async function deleteArticle(id: string) {
   try {
     await checkAdmin();
     await prisma.article.delete({ where: { id } });
+    revalidatePath("/", "layout");
     revalidatePath("/blog");
     revalidatePath("/admin/articles");
-    revalidatePath("/blog/[slug]", "page");
     return { success: true };
   } catch (error: any) {
     console.error("deleteArticle error:", error);

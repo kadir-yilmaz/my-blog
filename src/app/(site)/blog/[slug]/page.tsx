@@ -15,7 +15,8 @@ import { formatDate } from "@/lib/utils";
 import { prisma } from "@/lib/prisma";
 import { getArticleSlug } from "@/lib/slug";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface ArticleDetailPageProps {
   params: Promise<{

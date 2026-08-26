@@ -3,7 +3,8 @@ import { HeroSection } from "@/components/portfolio/hero-section";
 import { ArticleCard } from "@/components/blog/article-card";
 import { getArticles } from "@/actions/article.actions";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function HomePage() {
   const articlesRes = await getArticles({ limit: 10 });
