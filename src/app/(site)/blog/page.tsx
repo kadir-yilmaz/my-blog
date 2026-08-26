@@ -5,7 +5,7 @@
 
 import type { Metadata } from "next";
 import { ArticleCard } from "@/components/blog/article-card";
-import { CategoryTree } from "@/components/blog/category-tree";
+import { CategorySidebar } from "@/components/blog/category-sidebar";
 import { BlogSearch } from "@/components/blog/blog-search";
 import { Pagination } from "@/components/blog/pagination";
 import { getArticles } from "@/actions/article.actions";
@@ -58,9 +58,9 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
 
         {/* Main Content Layout with Sidebar */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Sidebar */}
+          {/* Sidebar (Desktop Sabit, Mobil Soldan Açılır Çekmece) */}
           <aside className="md:col-span-1">
-            <CategoryTree categories={categories} totalArticlesCount={categoryTreeRes.totalArticles} />
+            <CategorySidebar categories={categories} totalArticlesCount={categoryTreeRes.totalArticles} />
           </aside>
 
           {/* Articles Grid & Pagination */}

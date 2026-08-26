@@ -12,9 +12,15 @@ interface CategoryTreeProps {
   categories: CategoryNode[];
   activeSlug?: string;
   totalArticlesCount?: number;
+  hideTitleHeader?: boolean;
 }
 
-export function CategoryTree({ categories, activeSlug, totalArticlesCount }: CategoryTreeProps) {
+export function CategoryTree({
+  categories,
+  activeSlug,
+  totalArticlesCount,
+  hideTitleHeader = false,
+}: CategoryTreeProps) {
   const isAllActive = !activeSlug;
 
   const renderCategoryNode = (cat: CategoryNode, depth: number = 0) => {
@@ -59,8 +65,16 @@ export function CategoryTree({ categories, activeSlug, totalArticlesCount }: Cat
   };
 
   return (
-    <div className="rounded-xl border border-border/80 bg-card p-5 space-y-3 shadow-sm">
-      <h3 className="font-bold text-lg border-b border-border/60 pb-2">Kategoriler</h3>
+    <div
+      className={
+        hideTitleHeader
+          ? "space-y-2"
+          : "rounded-xl border border-border/80 bg-card p-5 space-y-3 shadow-sm"
+      }
+    >
+      {!hideTitleHeader && (
+        <h3 className="font-bold text-lg border-b border-border/60 pb-2">Kategoriler</h3>
+      )}
       <ul className="space-y-1.5 text-sm">
         {/* Default 'Tüm Makaleler' Option */}
         <li>

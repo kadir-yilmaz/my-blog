@@ -6,7 +6,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArticleCard } from "@/components/blog/article-card";
-import { CategoryTree } from "@/components/blog/category-tree";
+import { CategorySidebar } from "@/components/blog/category-sidebar";
 import { BlogSearch } from "@/components/blog/blog-search";
 import { Pagination } from "@/components/blog/pagination";
 import { getArticles } from "@/actions/article.actions";
@@ -119,9 +119,9 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
         {/* Main Content Layout with Sidebar */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Sidebar */}
+          {/* Sidebar (Desktop Sabit, Mobil Soldan Açılır Çekmece) */}
           <aside className="md:col-span-1">
-            <CategoryTree 
+            <CategorySidebar 
               categories={categories} 
               activeSlug={currentCategorySlug} 
               totalArticlesCount={categoryTreeRes.totalArticles} 

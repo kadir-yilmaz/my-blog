@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { BookOpen, User, Mail } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 
 interface HeaderNavProps {
@@ -13,10 +16,61 @@ interface HeaderNavProps {
 }
 
 export function HeaderNav({ author }: HeaderNavProps) {
+  const pathname = usePathname();
+
+  const isBlogActive = pathname.startsWith("/blog");
+  const isAboutActive = pathname === "/about";
+  const isContactActive = pathname === "/contact";
+
   return (
-    <div className="flex items-center space-x-2">
-      {/* Social Links */}
-      <div className="flex items-center gap-2 border-l border-border/60 pl-2.5 ml-2">
+    <div className="flex items-center space-x-1.5 sm:space-x-2">
+      {/* 📱 Mobilde Doğrudan İkon Butonları (Makaleler, Hakkımda, İletişim) */}
+      <div className="flex items-center gap-1 md:hidden">
+        {/* Makaleler Butonu */}
+        <Link
+          href="/blog"
+          title="Makaleler"
+          className={`flex items-center justify-center w-9 h-9 rounded-full border transition-all active:scale-95 ${
+            isBlogActive
+              ? "bg-red-600/15 border-red-500/40 text-red-600 font-bold"
+              : "border-border/80 bg-muted/40 text-foreground hover:bg-muted"
+          }`}
+          aria-label="Makaleler"
+        >
+          <BookOpen className="w-4 h-4" />
+        </Link>
+
+        {/* Hakkımda Butonu */}
+        <Link
+          href="/about"
+          title="Hakkımda"
+          className={`flex items-center justify-center w-9 h-9 rounded-full border transition-all active:scale-95 ${
+            isAboutActive
+              ? "bg-sky-500/15 border-sky-500/40 text-sky-600 font-bold"
+              : "border-border/80 bg-muted/40 text-foreground hover:bg-muted"
+          }`}
+          aria-label="Hakkımda"
+        >
+          <User className="w-4 h-4" />
+        </Link>
+
+        {/* İletişim Butonu */}
+        <Link
+          href="/contact"
+          title="İletişim"
+          className={`flex items-center justify-center w-9 h-9 rounded-full border transition-all active:scale-95 ${
+            isContactActive
+              ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-600 font-bold"
+              : "border-border/80 bg-muted/40 text-foreground hover:bg-muted"
+          }`}
+          aria-label="İletişim"
+        >
+          <Mail className="w-4 h-4" />
+        </Link>
+      </div>
+
+      {/* 💻 Masaüstünde Sosyal Medya Linkleri (Mobilde Gizli) */}
+      <div className="hidden md:flex items-center gap-2 border-l border-border/60 pl-2.5 ml-2">
         {author.github && (
           <a
             href={author.github}
@@ -45,7 +99,7 @@ export function HeaderNav({ author }: HeaderNavProps) {
         )}
       </div>
 
-      {/* Dark / Light Theme Toggle */}
+      {/* Dark / Light Theme Toggle (Tüm Cihazlarda) */}
       <ThemeToggle />
     </div>
   );
