@@ -16,7 +16,7 @@ export const createArticleSchema = z.object({
     .string()
     .max(500, "Özet en fazla 500 karakter olabilir")
     .optional(),
-  coverImage: z.string().url("Geçerli bir URL giriniz").optional().or(z.literal("")),
+  coverImage: z.string().optional().nullable(),
   categoryId: z.string().optional(),
   tagIds: z.array(z.string()).optional(),
   status: z.enum(["DRAFT", "PUBLISHED"]).default("DRAFT"),

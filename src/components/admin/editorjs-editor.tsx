@@ -168,11 +168,13 @@ const EditorJsEditor = forwardRef<EditorJsRef, EditorJsEditorProps>(function Edi
                 /**
                  * 🎓 Akıllı Önizleme (Instant Preview)
                  * Dosya seçildiğinde sunucuya gitmeden anında blob URL üretir.
-                 * 0 ms gecikmeyle editörde gösterilir, spinner takılması yaşanmaz!
+                 * Mikro-gecikme (60ms) ile @editorjs/image kütüphanesinin iç FileReader'ı ile senkronize olur,
+                 * spinner takılması veya görselin gizlenmesi kesin olarak engellenir.
                  */
                 async uploadByFile(file: File) {
                   try {
                     const blobUrl = registerTempImage(file);
+                    await new Promise((resolve) => setTimeout(resolve, 60));
                     return {
                       success: 1,
                       file: {

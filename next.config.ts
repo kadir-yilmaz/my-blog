@@ -29,6 +29,16 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+
+  // 🎓 Next.js Standalone'da /uploads isteklerini dinamik resim API'sine yönlendir
+  async rewrites() {
+    return [
+      {
+        source: "/uploads/:path*",
+        destination: "/api/images/:path*",
+      },
+    ];
+  },
 };
 
 export default nextConfig;

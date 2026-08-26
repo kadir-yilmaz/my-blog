@@ -1,6 +1,7 @@
 import ReactMarkdown from "react-markdown";
 import { CodeCopyListener } from "./code-copy-button";
 import { CodeBlock } from "./code-block";
+import { ZoomableImage } from "./zoomable-image";
 
 interface ArticleContentProps {
   content: string;
@@ -124,33 +125,15 @@ function EditorJsRenderer({ content }: { content: string }) {
               if (!url) return null;
 
               return (
-                <figure
+                <ZoomableImage
                   key={id}
-                  className={`my-8 flex flex-col items-center group ${
-                    withBackground ? "p-4 sm:p-6 bg-muted/40 dark:bg-zinc-900/60 rounded-2xl border border-border/70" : ""
-                  }`}
-                >
-                  <div
-                    className={`overflow-hidden rounded-xl transition-all duration-200 ${
-                      withBorder ? "border-2 border-primary/40 shadow-lg" : "border border-border/60 shadow-sm"
-                    } ${stretched ? "w-full" : "max-w-full"}`}
-                  >
-                    <img
-                      src={url}
-                      alt={caption || "Görsel"}
-                      className={`h-auto object-contain mx-auto block ${
-                        stretched ? "w-full max-h-[850px]" : "max-w-full max-h-[650px]"
-                      } rounded-xl`}
-                      loading="lazy"
-                    />
-                  </div>
-                  {caption && (
-                    <figcaption
-                      className="text-center text-xs sm:text-sm text-muted-foreground mt-2.5 italic max-w-2xl px-4"
-                      dangerouslySetInnerHTML={{ __html: caption }}
-                    />
-                  )}
-                </figure>
+                  src={url}
+                  alt={caption || "Makale Görseli"}
+                  caption={caption}
+                  withBorder={withBorder}
+                  withBackground={withBackground}
+                  stretched={stretched}
+                />
               );
             }
 
@@ -328,6 +311,13 @@ function MarkdownContent({ content }: { content: string }) {
             </code>
           );
         },
+        img: ({ node, ...props }) => (
+          <ZoomableImage
+            src={String(props.src || "")}
+            alt={props.alt}
+            caption={props.alt}
+          />
+        ),
       }}
     >
       {content}

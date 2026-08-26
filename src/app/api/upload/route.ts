@@ -170,7 +170,7 @@ export async function POST(request: Request) {
 
     // 2. FormData Request (Binary File upload)
     const formData = await request.formData();
-    const file: File | null = formData.get("file") as unknown as File;
+    const file: File | null = (formData.get("file") || formData.get("image")) as unknown as File;
 
     if (!file) {
       return NextResponse.json({ success: 0, error: "Dosya bulunamadı." }, { status: 400 });

@@ -164,6 +164,12 @@ h4.ce-header {
   margin: 0 auto;
   display: block;
 }
+.image-tool--filled .image-tool__image-picture {
+  display: block !important;
+}
+.image-tool--filled .image-tool__image-preloader {
+  display: none !important;
+}
 .image-tool--stretched .image-tool__image-picture {
   width: 100% !important;
   max-height: 850px !important;
