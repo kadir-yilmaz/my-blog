@@ -4,14 +4,20 @@ import { writeFile, mkdir } from "fs/promises";
 import { join } from "path";
 import { existsSync } from "fs";
 
-// Determine upload directory paths with multiple fallbacks for IIS Standalone
-function getUploadDirs(): string[] {
-  const cwd = process.cwd();
-  return [
-    join(cwd, "public", "uploads"),
-    join(cwd, "public", "images"),
-    join(cwd, "uploads"),
-  ];
+// Helper to get normalized project root directory (handles IIS cwd ending with /public)
+function getProjectRootDir(): string {
+  let cwd = process.cwd();
+  const normalized = cwd.replace(/\\/g, "/").toLowerCase();
+  if (normalized.endsWith("/public")) {
+    cwd = join(cwd, "..");
+  }
+  return cwd;
+}
+
+// Target upload directory: ALWAYS wwwroot/public/uploads
+function getTargetUploadDir(): string {
+  const root = getProjectRootDir();
+  return join(root, "public", "uploads");
 }
 
 // Helper to save image buffer to disk or MinIO (S3)
@@ -54,27 +60,16 @@ async function saveImageBuffer(buffer: Buffer, filename: string, mimeType: strin
   }
 
   // 2. Local Disk Storage (Reliable for IIS Standalone & Local Dev)
-  const uploadDirs = getUploadDirs();
-  let saved = false;
-  let lastError: any = null;
-
-  for (const dir of uploadDirs) {
-    try {
-      if (!existsSync(dir)) {
-        await mkdir(dir, { recursive: true });
-      }
-      const filepath = join(dir, filename);
-      await writeFile(filepath, buffer);
-      saved = true;
-      break;
-    } catch (err) {
-      lastError = err;
-      console.warn(`⚠️ ${dir} dizinine yazılamadı:`, err);
+  const targetDir = getTargetUploadDir();
+  try {
+    if (!existsSync(targetDir)) {
+      await mkdir(targetDir, { recursive: true });
     }
-  }
-
-  if (!saved) {
-    throw new Error(`Görsel diske kaydedilemedi: ${lastError?.message || "Yazma izni hatası"}`);
+    const filepath = join(targetDir, filename);
+    await writeFile(filepath, buffer);
+  } catch (err: any) {
+    console.error(`❌ ${targetDir} dizinine yazılamadı:`, err);
+    throw new Error(`Görsel diske kaydedilemedi: ${err?.message || "Yazma izni hatası"}`);
   }
 
   // Always return the dedicated dynamic image API route URL for guaranteed streaming in Next.js Standalone

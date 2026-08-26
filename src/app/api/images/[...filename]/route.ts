@@ -40,11 +40,17 @@ export async function GET(
       return new NextResponse("Not Found", { status: 404 });
     }
 
-    const cwd = process.cwd();
+    let cwd = process.cwd();
+    const normalized = cwd.replace(/\\/g, "/").toLowerCase();
+    if (normalized.endsWith("/public")) {
+      cwd = join(cwd, "..");
+    }
+
     const candidatePaths = [
       join(cwd, "public", "uploads", cleanFilename),
       join(cwd, "public", "images", cleanFilename),
       join(cwd, "uploads", cleanFilename),
+      join(cwd, "public", "public", "uploads", cleanFilename), // Fallback for any legacy uploads
     ];
 
     let foundPath: string | null = null;
