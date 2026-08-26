@@ -97,32 +97,30 @@ export function ZoomableImage({
 
   return (
     <>
-      <figure
-        className={`my-8 flex flex-col items-center group/fig ${
-          withBackground
-            ? "p-4 sm:p-6 bg-muted/40 dark:bg-zinc-900/60 rounded-2xl border border-border/70"
-            : ""
-        }`}
-      >
+      <figure className="my-6 flex flex-col items-center justify-center w-full group/fig">
         <div
           onClick={handleOpen}
           className={`relative group cursor-zoom-in overflow-hidden rounded-xl transition-all duration-300 hover:shadow-xl hover:border-primary/50 ${
-            withBorder
+            stretched ? "w-full" : "w-fit max-w-full"
+          } ${
+            withBackground
+              ? "p-2 sm:p-3 bg-muted/30 dark:bg-zinc-900/40 border border-border/70 shadow-sm"
+              : withBorder
               ? "border-2 border-primary/40 shadow-lg"
-              : "border border-border/60 shadow-sm"
-          } ${stretched ? "w-full" : "max-w-full"}`}
+              : "border border-border/60 shadow-xs"
+          }`}
         >
           <img
             src={src}
             alt={caption || alt}
-            className={`h-auto object-contain mx-auto block transition-transform duration-300 group-hover:scale-[1.01] ${
-              stretched ? "w-full max-h-[850px]" : "max-w-full max-h-[650px]"
-            } rounded-xl`}
+            className={`h-auto w-auto max-w-full object-contain mx-auto block transition-transform duration-300 group-hover:scale-[1.01] ${
+              stretched ? "w-full max-h-[850px]" : "max-h-[650px]"
+            } rounded-lg`}
             loading="lazy"
           />
 
           {/* Hover Zoom Göstergesi (Sağ Üst Rozet) */}
-          <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 bg-black/70 hover:bg-black/85 text-white rounded-lg px-2.5 py-1.5 text-xs font-medium flex items-center gap-1.5 shadow-lg backdrop-blur-sm pointer-events-none border border-white/15">
+          <div className="absolute top-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-all duration-200 transform translate-y-1 group-hover:translate-y-0 bg-black/70 hover:bg-black/85 text-white rounded-lg px-2 py-1 text-[11px] font-medium flex items-center gap-1.5 shadow-lg backdrop-blur-sm pointer-events-none border border-white/15">
             <ZoomIn className="w-3.5 h-3.5 text-white" />
             <span>Büyüt</span>
           </div>
@@ -130,7 +128,7 @@ export function ZoomableImage({
 
         {caption && (
           <figcaption
-            className="text-center text-xs sm:text-sm text-muted-foreground mt-2.5 italic max-w-2xl px-4"
+            className="text-center text-xs sm:text-sm text-muted-foreground mt-2 italic max-w-2xl px-4"
             dangerouslySetInnerHTML={{ __html: caption }}
           />
         )}
