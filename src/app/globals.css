@@ -225,12 +225,56 @@ html {
   padding-bottom: 0.75rem !important;
 }
 
+/* 🎓 Prose Typography Headings & Body Colors (Açık modda siyah, koyu modda beyaz) */
+.prose {
+  color: var(--foreground) !important;
+}
+
+.prose h1,
+.prose h2,
+.prose h3,
+.prose h4,
+.prose h5,
+.prose h6 {
+  color: var(--foreground) !important;
+  font-weight: 700 !important;
+}
+
+.prose p,
+.prose li,
+.prose span,
+.prose strong,
+.prose b {
+  color: var(--foreground);
+}
+
+/* 🎓 Editor.js Marker (.cdx-marker) ve <mark> Vurguları */
+mark,
+.cdx-marker,
+mark.cdx-marker,
+.prose mark {
+  background-color: #fef08a !important; /* Açık modda parlak sarı zemin */
+  color: #0f172a !important;            /* Açık modda simsiyah / koyu lacivert yazı */
+  padding: 0.15rem 0.35rem !important;
+  border-radius: 0.25rem !important;
+  font-weight: 600 !important;
+}
+
+.dark mark,
+.dark .cdx-marker,
+.dark mark.cdx-marker,
+.dark .prose mark {
+  background-color: rgba(234, 179, 8, 0.25) !important;
+  color: #fef08a !important;            /* Koyu modda açık sarı yazı */
+  border: 1px solid rgba(234, 179, 8, 0.4) !important;
+}
+
 /* 🎓 Inline `code` ve Editor.js (.cdx-inline-code) Vurguları (Açık modda siyah yazı, koyu modda beyaz yazı) */
 .prose code:not(.code-block-container code),
 .cdx-inline-code,
 .inline-code,
 mark.cdx-inline-code {
-  background-color: #e2e8f0 !important;
+  background-color: #f1f5f9 !important;
   color: #0f172a !important; /* Açık modda simsiyah / koyu lacivert */
   border: 1px solid #cbd5e1 !important;
   border-radius: 0.375rem !important;

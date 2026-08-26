@@ -72,10 +72,10 @@ function EditorJsRenderer({ content }: { content: string }) {
             case "header": {
               const level = block.data.level || 2;
               const text = block.data.text || "";
-              if (level === 1) return <h1 key={id} className="text-3xl font-extrabold tracking-tight mt-8 mb-4 border-b pb-2" dangerouslySetInnerHTML={{ __html: text }} />;
-              if (level === 3) return <h3 key={id} className="text-xl font-semibold mt-4 mb-2" dangerouslySetInnerHTML={{ __html: text }} />;
-              if (level === 4) return <h4 key={id} className="text-lg font-semibold mt-4 mb-2" dangerouslySetInnerHTML={{ __html: text }} />;
-              return <h2 key={id} className="text-2xl font-bold tracking-tight mt-6 mb-3" dangerouslySetInnerHTML={{ __html: text }} />;
+              if (level === 1) return <h1 key={id} className="text-3xl font-extrabold tracking-tight mt-8 mb-4 border-b border-border/60 pb-2 text-foreground font-bold" dangerouslySetInnerHTML={{ __html: text }} />;
+              if (level === 3) return <h3 key={id} className="text-xl font-semibold mt-4 mb-2 text-foreground font-bold" dangerouslySetInnerHTML={{ __html: text }} />;
+              if (level === 4) return <h4 key={id} className="text-lg font-semibold mt-4 mb-2 text-foreground font-semibold" dangerouslySetInnerHTML={{ __html: text }} />;
+              return <h2 key={id} className="text-2xl font-bold tracking-tight mt-6 mb-3 text-foreground font-bold" dangerouslySetInnerHTML={{ __html: text }} />;
             }
 
             case "paragraph":
