@@ -293,6 +293,20 @@ mark.cdx-inline-code {
   border: 1px solid #3f3f46 !important;
 }
 
+/* 🎓 Prose Resim & Şekil (Figure) Boşluk Sıfırlaması */
+.prose figure {
+  margin-top: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
+}
+.prose figure img,
+.prose figure > div > img {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  display: block !important;
+}
+
 /* ==========================================
  * 🎓 View Transitions (Theme Toggle Animasyonu)
  * ==========================================
