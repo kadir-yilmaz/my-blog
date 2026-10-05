@@ -6,5 +6,8 @@ services:
     ports:
       - "3005:3000"
     environment:
-      - DATABASE_URL=postgresql://admin:SecretPassword123!@192.168.1.153:5432/mydatabase?schema=public
-      - NEXT_PUBLIC_APP_URL=https://kadiryilmaz.online
+      - DATABASE_URL=${DATABASE_URL}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+      - AUTH_SECRET=${AUTH_SECRET}
+      - ADMIN_EMAIL=${ADMIN_EMAIL}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD}
