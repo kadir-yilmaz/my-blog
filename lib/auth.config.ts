@@ -64,7 +64,7 @@ export default {
       const isLoggedIn = !!auth?.user;
       const isAdmin = auth?.user?.isAdmin === true;
       const isAdminRoute = nextUrl.pathname.startsWith("/admin");
-      const isAuthRoute = nextUrl.pathname.startsWith("/login") || nextUrl.pathname.startsWith("/register");
+      const isAuthRoute = nextUrl.pathname.startsWith("/login");
 
       // Admin rotalarına sadece admin erişebilir
       if (isAdminRoute) {

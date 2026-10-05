@@ -1,17 +1,10 @@
 services:
-  mssql:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: myblog_mssql
+  my-blog-web:
+    build: .
+    container_name: my-blog-nextjs
     restart: unless-stopped
-    environment:
-      - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD:-Password123!}
-      - MSSQL_PID=Developer
     ports:
-      - "1433:1433"
-    volumes:
-      - mssql_data:/var/opt/mssql
-
-volumes:
-  mssql_data:
-    driver: local
+      - "3005:3000"
+    environment:
+      - DATABASE_URL=postgresql://admin:SecretPassword123!@192.168.1.153:5432/mydatabase?schema=public
+      - NEXT_PUBLIC_APP_URL=https://kadiryilmaz.online
