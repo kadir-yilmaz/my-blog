@@ -80,6 +80,20 @@ export default {
 
       return true;
     },
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.isAdmin = (user as any).isAdmin ?? false;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user) {
+        (session.user as any).id = token.id as string;
+        (session.user as any).isAdmin = token.isAdmin as boolean;
+      }
+      return session;
+    },
   },
 } satisfies NextAuthConfig;
 // 🎓 `satisfies` vs `as`:
