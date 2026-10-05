@@ -7,10 +7,12 @@ import { PrismaClient } from "@prisma/client";
 import { Pool } from "pg";
 import { PrismaPg } from "@prisma/adapter-pg";
 
-const connectionString = process.env.DATABASE_URL;
+let connectionString = process.env.DATABASE_URL;
 
+// Build esnasında (Portainer) ortam değişkeni henüz gelmemiş olabilir
 if (!connectionString) {
-  throw new Error("DATABASE_URL ortam değişkeni bulunamadı. Lütfen .env dosyanızı veya secret ayarlarınızı kontrol edin.");
+  console.warn("⚠️ DATABASE_URL bulunamadı. Build aşaması olduğu varsayılıyor.");
+  connectionString = "postgresql://dummy:dummy@localhost:5432/dummy";
 }
 
 const pool = new Pool({ connectionString });
