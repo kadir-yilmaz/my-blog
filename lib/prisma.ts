@@ -1,14 +1,11 @@
 // ==========================================
-// 🎓 Prisma Client Singleton (Prisma 7 SQL Server Adapter Pattern)
+// 🎓 Prisma Client Singleton (Prisma 7 Postgres Adapter Pattern)
 // ==========================================
-// Prisma 7 ile birlikte veritabanı sürücüleri "adapter" mimarisine geçti.
-// Microsoft SQL Server için @prisma/adapter-mssql kullanılır.
-// Next.js development hot reload esnasında bağlantı havuzunun (connection pool)
-// tükenmesini engellemek için singleton pattern kullanılmaya devam edilir.
 
 import "dotenv/config";
 import { PrismaClient } from "@prisma/client";
-import { PrismaMssql } from "@prisma/adapter-mssql";
+import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 const connectionString = process.env.DATABASE_URL;
 
@@ -16,7 +13,8 @@ if (!connectionString) {
   throw new Error("DATABASE_URL ortam değişkeni bulunamadı. Lütfen .env dosyanızı veya secret ayarlarınızı kontrol edin.");
 }
 
-const adapter = new PrismaMssql(connectionString);
+const pool = new Pool({ connectionString });
+const adapter = new PrismaPg(pool);
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
