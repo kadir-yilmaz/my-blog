@@ -11,3 +11,9 @@ services:
       - AUTH_SECRET=${AUTH_SECRET}
       - ADMIN_EMAIL=${ADMIN_EMAIL}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD}
+    networks:
+      - server-net 
+
+networks:
+  server-net:
+    external: true
