@@ -51,7 +51,7 @@ export default async function HomePage() {
 
             <div className="mt-auto flex items-center justify-between gap-4 pt-4 border-t border-border/50">
               <a 
-                href="https://github.com/kadiryilmaz" 
+                href="https://github.com/kadir-yilmaz/DefenceDB" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="flex-1 inline-flex justify-center items-center gap-2 px-4 py-2 text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors"
@@ -96,7 +96,7 @@ export default async function HomePage() {
 
             <div className="mt-auto flex items-center justify-between gap-4 pt-4 border-t border-border/50">
               <a 
-                href="https://github.com/kadiryilmaz" 
+                href="https://github.com/kadir-yilmaz/GameGaraj" 
                 target="_blank" 
                 rel="noopener noreferrer" 
                 className="flex-1 inline-flex justify-center items-center gap-2 px-4 py-2 text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-lg transition-colors"
